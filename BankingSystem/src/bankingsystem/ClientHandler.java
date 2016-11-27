@@ -148,7 +148,7 @@ public class ClientHandler extends Thread
         }
         catch(Exception e)
         {
-            System.out.println(e + ": Error with a client happened!");
+            System.out.println(e.getMessage() + ": Error with a client happened!");
         }
     }
 }

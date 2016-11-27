@@ -23,7 +23,7 @@ public class BankingSystem {
         }
         catch(Exception e)
         {
-            System.out.println(e + ": Connection with a client failed!");
+            System.out.println(e.getMessage() + ": Connection with a client failed!");
         }
     }
     
