@@ -20,12 +20,13 @@ public class ClientHandler extends Thread
     private String[] data;
     private String bank_amount_account;
     private String CurrentBalance;
-    DatabaseInterface di;
+    //DatabaseInterface di;
     String [] AccountTableColumns = {"PersonName", "Pw", "Balance"};
     public ClientHandler(Socket s)
     {
         this.clientSocket = s;
         this.exitFlag = false;
+        DatabaseInterface.Init("jdbc:mysql://127.0.0.1:3306/BankingSystem", "root", "u1234q-a-z");
     }
     @Override
     public void run()
@@ -36,7 +37,7 @@ public class ClientHandler extends Thread
             DataOutputStream dos = new DataOutputStream(clientSocket.getOutputStream());
             dos.writeUTF("new?login?");
             request_new_login = dis.readUTF();
-            if(request_new_login == "Sign In")
+            if(request_new_login.equals("Sign In"))
             {
                 dos.writeUTF("username?password?");
                 while(true)
@@ -44,7 +45,7 @@ public class ClientHandler extends Thread
                     id_password = dis.readUTF();
                     data = id_password.split("\n");
                     ID = data[0];
-                    if(di.Authentication(ID, data[1]))
+                    if(DatabaseInterface.Authentication(ID, data[1]))
                     {
                         dos.writeUTF("verified");
                         break;
@@ -55,18 +56,18 @@ public class ClientHandler extends Thread
                     }
                 }
             }
-            else if(request_new_login == "Sign Up")
+            else if(request_new_login.equals("Sign Up"))
             {
                 dos.writeUTF("username?password?deposit?");
                 username_password_deposit = dis.readUTF();
                 data = username_password_deposit.split("\n");
                 
-                di.Insertion("account", AccountTableColumns, data) ;
+                DatabaseInterface.Insertion("account", AccountTableColumns, data) ;
             }
             while(true)
             {
                 show_options = dis.readUTF();
-                if(show_options == "showoptions")
+                if(show_options.equals("showoptions"))
                 {
                     dos.writeUTF("options");
                 }
@@ -77,42 +78,42 @@ public class ClientHandler extends Thread
                     switch(option)
                     {
                         case "check":
-                            CurrentBalance = di.CheckBalance(ID);
+                            CurrentBalance = DatabaseInterface.CheckBalance(ID);
                             dos.writeUTF(CurrentBalance);
                             break;
                         case "deposit":
                             dos.writeUTF("amount?");
                             amount_to_deposit = dis.readUTF();
-                            CurrentBalance = di.CheckBalance(ID);
+                            CurrentBalance = DatabaseInterface.CheckBalance(ID);
                             balance = Float.parseFloat(CurrentBalance) + Float.parseFloat(amount_to_deposit);
                             CurrentBalance = String.valueOf(balance);
-                            di.Update("account", "Balance", CurrentBalance, "ID", ID);
+                            DatabaseInterface.Update("account", "Balance", CurrentBalance, "ID", ID);
                             break;
                         case "withdraw":
                             dos.writeUTF("amountw?");
                             amount_to_withdraw = dis.readUTF();
-                            CurrentBalance = di.CheckBalance(ID);
+                            CurrentBalance = DatabaseInterface.CheckBalance(ID);
                             balance = Float.parseFloat(CurrentBalance) - Float.parseFloat(amount_to_withdraw);
                             CurrentBalance = String.valueOf(balance);
-                            di.Update("account", "Balance", CurrentBalance, "ID", ID);
+                            DatabaseInterface.Update("account", "Balance", CurrentBalance, "ID", ID);
                             break;
                         case "transfersame":
                             dos.writeUTF("amount?account?");
                             amount_account = dis.readUTF();
                             data = amount_account.split(" ");
                             
-                            if(di.ValidAccount(Integer.parseInt(data[1])))
+                            if(DatabaseInterface.ValidAccount(Integer.parseInt(data[1])))
                             {
                                 
-                                CurrentBalance = di.CheckBalance(ID);
+                                CurrentBalance = DatabaseInterface.CheckBalance(ID);
                                 if(Float.parseFloat(CurrentBalance) >= Float.parseFloat(data[0]))
                                 {
-                                    String OldBalanceReceiver = di.CheckBalance(data[1]);
+                                    String OldBalanceReceiver = DatabaseInterface.CheckBalance(data[1]);
                                     float newBalanceSender, newBalanceReceiver;
                                     newBalanceSender = Float.parseFloat(CurrentBalance) - Float.parseFloat(data[0]);
                                     newBalanceReceiver = Float.parseFloat(OldBalanceReceiver) + Float.parseFloat(data[0]);
-                                    di.Update("account", "Balance", String.valueOf(newBalanceSender), "ID", ID);
-                                    di.Update("account", "Balance", String.valueOf(newBalanceReceiver), "ID", data[1]);
+                                    DatabaseInterface.Update("account", "Balance", String.valueOf(newBalanceSender), "ID", ID);
+                                    DatabaseInterface.Update("account", "Balance", String.valueOf(newBalanceReceiver), "ID", data[1]);
                                     dos.writeUTF("done");
                                 }
                                 else

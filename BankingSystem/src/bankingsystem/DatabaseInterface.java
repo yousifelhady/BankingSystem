@@ -5,7 +5,7 @@ public class DatabaseInterface
 {
     private static PreparedStatement preparedStmt;
     private static Connection conn;
-    public DatabaseInterface (String url, String username, String pw)
+    public static void Init (String url, String username, String pw)
     {
         try {
             // create a mysql database connection
@@ -66,7 +66,7 @@ public class DatabaseInterface
             Statement st = conn.createStatement();
             ResultSet rs = st.executeQuery(query);
             String res = rs.getString("Pw");
-            if (res != pw)
+            if (!res.equals(pw))
             {
                 return false;
             }

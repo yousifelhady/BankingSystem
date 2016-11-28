@@ -12,13 +12,13 @@ public class BankingSystem {
     {
         try
         {
-            ServerSocket server = new ServerSocket(5005);
+            ServerSocket server = new ServerSocket(1234);
             
             while (true) {
                 Socket clientSocket = server.accept();
                 System.out.println("Connected with a client!");
-                //ClientHandler ch = new ClientHandler(c);
-                //ch.start();
+                ClientHandler ch = new ClientHandler(clientSocket);
+                ch.start();
 
             }
         }
