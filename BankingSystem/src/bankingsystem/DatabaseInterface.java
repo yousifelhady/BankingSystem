@@ -84,7 +84,7 @@ public class DatabaseInterface
         try {
             String query = "SELECT Balance FROM account WHERE ID = ?";
             preparedStmt = conn.prepareStatement(query);
-            preparedStmt.setString (1, AccountID);
+            preparedStmt.setInt(1, Integer.parseInt(AccountID));
             Statement st = conn.createStatement();
             ResultSet rs = st.executeQuery(query);
             res = rs.getString("Balance");

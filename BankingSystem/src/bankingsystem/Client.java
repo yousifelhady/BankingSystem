@@ -19,7 +19,7 @@ public class Client
         if (msg.equals("new?login?"))
         {
             state = 1; 
-            System.out.println("Sign In \n Sign Up"); 
+            System.out.println("Sign In\nSign Up"); 
         }
         else if(msg.equals("username?password?deposit?")) // sign up
         {
