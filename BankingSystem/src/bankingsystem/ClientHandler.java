@@ -7,10 +7,11 @@ import java.net.*;
 public class ClientHandler extends Thread
 {
     private Socket clientSocket;
-    private String username_password;
+    private String id_password;
     private String request_new_login;
     private String show_options;
     private String option;
+    private String ID;
     private boolean exitFlag;
     private String username_password_deposit;
     private String amount_to_deposit;
@@ -18,6 +19,9 @@ public class ClientHandler extends Thread
     private String amount_account;
     private String[] data;
     private String bank_amount_account;
+    private String CurrentBalance;
+    DatabaseInterface di;
+    String [] AccountTableColumns = {"PersonName", "Pw", "Balance"};
     public ClientHandler(Socket s)
     {
         this.clientSocket = s;
@@ -37,10 +41,10 @@ public class ClientHandler extends Thread
                 dos.writeUTF("username?password?");
                 while(true)
                 {
-                    username_password = dis.readUTF();
-                    data = username_password.split("\n");
-                    //check in database
-                    if(//check is correct)
+                    id_password = dis.readUTF();
+                    data = id_password.split("\n");
+                    ID = data[0];
+                    if(di.Authentication(ID, data[1]))
                     {
                         dos.writeUTF("verified");
                         break;
@@ -56,7 +60,8 @@ public class ClientHandler extends Thread
                 dos.writeUTF("username?password?deposit?");
                 username_password_deposit = dis.readUTF();
                 data = username_password_deposit.split("\n");
-                //update database
+                
+                di.Insertion("account", AccountTableColumns, data) ;
             }
             while(true)
             {
@@ -67,34 +72,47 @@ public class ClientHandler extends Thread
                 }
                 while(!exitFlag)
                 {
-                    option = dis.readUTF();
+                    option = dis.readUTF(); 
+                    float balance;
                     switch(option)
                     {
                         case "check":
-                            //check on database
-                            //dos.writeUTF(amount of money);
+                            CurrentBalance = di.CheckBalance(ID);
+                            dos.writeUTF(CurrentBalance);
                             break;
                         case "deposit":
                             dos.writeUTF("amount?");
                             amount_to_deposit = dis.readUTF();
-                            //update database
+                            CurrentBalance = di.CheckBalance(ID);
+                            balance = Float.parseFloat(CurrentBalance) + Float.parseFloat(amount_to_deposit);
+                            CurrentBalance = String.valueOf(balance);
+                            di.Update("account", "Balance", CurrentBalance, "ID", ID);
                             break;
                         case "withdraw":
                             dos.writeUTF("amountw?");
                             amount_to_withdraw = dis.readUTF();
-                            //update database
+                            CurrentBalance = di.CheckBalance(ID);
+                            balance = Float.parseFloat(CurrentBalance) - Float.parseFloat(amount_to_withdraw);
+                            CurrentBalance = String.valueOf(balance);
+                            di.Update("account", "Balance", CurrentBalance, "ID", ID);
                             break;
                         case "transfersame":
                             dos.writeUTF("amount?account?");
                             amount_account = dis.readUTF();
                             data = amount_account.split(" ");
-                            //check database for validity of account
-                            if(//valid account)
+                            
+                            if(di.ValidAccount(Integer.parseInt(data[1])))
                             {
-                                //check database if balance is enough for tansfer
-                                if(//enough)
+                                
+                                CurrentBalance = di.CheckBalance(ID);
+                                if(Float.parseFloat(CurrentBalance) >= Float.parseFloat(data[0]))
                                 {
-                                    //update database
+                                    String OldBalanceReceiver = di.CheckBalance(data[1]);
+                                    float newBalanceSender, newBalanceReceiver;
+                                    newBalanceSender = Float.parseFloat(CurrentBalance) - Float.parseFloat(data[0]);
+                                    newBalanceReceiver = Float.parseFloat(OldBalanceReceiver) + Float.parseFloat(data[0]);
+                                    di.Update("account", "Balance", String.valueOf(newBalanceSender), "ID", ID);
+                                    di.Update("account", "Balance", String.valueOf(newBalanceReceiver), "ID", data[1]);
                                     dos.writeUTF("done");
                                 }
                                 else
@@ -107,12 +125,15 @@ public class ClientHandler extends Thread
                                 dos.writeUTF("invalidid");
                             }
                             break;
-                        case "transferother":
+                        /*case "transferother":
+                            //beta3ak ya 3ebs el mips el gebs :D
                             dos.writeUTF("bankname?amount?account?");
                             bank_amount_account = dis.readUTF();
                             data = bank_amount_account.split(" ");
                             //check database for validity of account
                             if(//valid account)
+                                    
+                                
                             {
                                 //check database if balance is enough for tansfer
                                 if(//enough)
@@ -130,7 +151,7 @@ public class ClientHandler extends Thread
                             {
                                 dos.writeUTF("invalidid");
                             }
-                            break;
+                            break;*/
                         case "view":
                             //check database for history
                             //dos.writeUTF(#history);

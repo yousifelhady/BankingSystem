@@ -4,7 +4,7 @@ import java.net.ServerSocket;
 import java.net.Socket;
 
 public class BankingSystem {
-
+    
     /**
      * @param args the command line arguments
      */
@@ -13,6 +13,7 @@ public class BankingSystem {
         try
         {
             ServerSocket server = new ServerSocket(5005);
+            
             while (true) {
                 Socket clientSocket = server.accept();
                 System.out.println("Connected with a client!");
