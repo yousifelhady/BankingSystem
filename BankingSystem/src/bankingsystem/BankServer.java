@@ -1,13 +1,11 @@
 package bankingsystem;
 
+import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
 
-public class BankingSystem {
+public class BankServer {
     
-    /**
-     * @param args the command line arguments
-     */
     public static void main(String[] args) 
     {
         try
@@ -17,12 +15,12 @@ public class BankingSystem {
             while (true) {
                 Socket clientSocket = server.accept();
                 System.out.println("Connected with a client!");
-                ClientHandler ch = new ClientHandler(clientSocket);
+                ClientHandler_ServerSide ch = new ClientHandler_ServerSide(clientSocket);
                 ch.start();
 
             }
         }
-        catch(Exception e)
+        catch(IOException e)
         {
             System.out.println(e.getMessage() + ": Connection with a client failed!");
         }

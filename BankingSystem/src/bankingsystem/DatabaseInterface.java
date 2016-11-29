@@ -27,7 +27,10 @@ public class DatabaseInterface
             preparedStmt = conn.prepareStatement(query);
             Statement st = conn.createStatement();
             ResultSet rs = st.executeQuery(query);
-            res = rs.getInt("ID");
+            while(rs.next())
+            {
+                res = rs.getInt("ID");
+            }
             if (res == AccountID) {
                 return true;
             }
@@ -48,7 +51,10 @@ public class DatabaseInterface
             preparedStmt.setString (1, Telephone);
             Statement st = conn.createStatement();
             ResultSet rs = st.executeQuery(query);
-            res = rs.getString("ID");
+            while(rs.next())
+            {
+                res = rs.getString("ID");
+            }
         }
         catch (Exception e) {
             System.err.println("Got an exception!");
@@ -60,36 +66,47 @@ public class DatabaseInterface
     public static boolean Authentication (String AccountID, String pw)
     {
         try {
-            String query = "SELECT Pw FROM account WHERE ID = ?";
+            String query = "SELECT Pw FROM account WHERE ID = " + AccountID;
             preparedStmt = conn.prepareStatement(query);
-            preparedStmt.setString (1, AccountID);
+            //preparedStmt.setString (1, AccountID);
             Statement st = conn.createStatement();
             ResultSet rs = st.executeQuery(query);
-            String res = rs.getString("Pw");
-            if (!res.equals(pw))
+            //System.out.println(rs);
+            String res = "";
+            while(rs.next())
+            {
+                res = rs.getString("Pw");
+            }
+            if(res.equals(pw))
+            {
+                return true;
+            }
+            else
             {
                 return false;
             }
         }
-        catch (Exception e) {
-            System.err.println("Got an exception!");
-            System.err.println(e.getMessage());
+            catch (SQLException e) {
+            System.out.println(e.getMessage() + "Got an exception!");
         }
-        return true;
+        return false;
     }
     //check balance
     public static String CheckBalance (String AccountID)
     {
         String res = "";
         try {
-            String query = "SELECT Balance FROM account WHERE ID = ?";
+            String query = "SELECT Balance FROM account WHERE ID =" + AccountID;
             preparedStmt = conn.prepareStatement(query);
-            preparedStmt.setInt(1, Integer.parseInt(AccountID));
+            //preparedStmt.setInt(1, Integer.parseInt(AccountID));
             Statement st = conn.createStatement();
             ResultSet rs = st.executeQuery(query);
-            res = rs.getString("Balance");
+            while(rs.next())
+            {
+                res = rs.getString("Balance");
+            }
         }
-        catch (Exception e) {
+        catch (SQLException e) {
             System.err.println("Got an exception!");
             System.err.println(e.getMessage());
         }
@@ -99,29 +116,30 @@ public class DatabaseInterface
     public static void Insertion (String tname, String[] column, String[] value)
     {
         String tmpColumn = column[0];
-        String tmpValue = "?";
+        String tmpValue = "\'" + value[0] + "\'";
         for (int i = 1 ; i < column.length ; i++)
         {
             tmpColumn += ", " + column[i];
-            tmpValue += ", ?";
+            tmpValue += ", \'" + value[i] + "\'";
+            
         }
         
         String query = "INSERT INTO " + tname + " (" + tmpColumn + ")"
-        + " VALUES " + tmpValue;
+        + " VALUES " + "(" + tmpValue + ")";
         
         try {
             //create the mysql insert preparedstatement
             preparedStmt = conn.prepareStatement(query);
             
-            for (int i = 0 ; i < column.length ; i++)
-            {
-                preparedStmt.setString (i, value[i]);
-            }
+//            for (int i = 0 ; i < column.length ; i++)
+//            {
+//                preparedStmt.setString (i, value[i]);
+//            }
             
             //execute the preparedstatement
             preparedStmt.execute();
         }
-        catch (Exception e)
+        catch (SQLException e)
         {
             System.err.println("Got an exception!");
             System.err.println(e.getMessage());
@@ -161,18 +179,18 @@ public class DatabaseInterface
     public static void Update (String tname, String column, String value, String key, String keyValue)
     {
         String query = "UPDATE " + tname + " SET " + column 
-        + " = ? WHERE " + key + " = ?";
+        + " = " + value + " WHERE " + key + " = " + keyValue;
         
         try {
             //create the mysql insert preparedstatement
             preparedStmt = conn.prepareStatement(query);
-            preparedStmt.setString (1, value);
-            preparedStmt.setString (2, keyValue);
+            //preparedStmt.setString (1, value);
+            //preparedStmt.setString (2, keyValue);
             
             //execute the preparedstatement
             preparedStmt.executeUpdate();
         }
-        catch (Exception e)
+        catch (SQLException e)
         {
             System.err.println("Got an exception!");
             System.err.println(e.getMessage());

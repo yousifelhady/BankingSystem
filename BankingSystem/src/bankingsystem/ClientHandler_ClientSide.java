@@ -2,29 +2,100 @@ package bankingsystem;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
+import java.io.IOException;
 import java.net.Socket;
 import java.util.Scanner;
 
-public class Client 
+public class ClientHandler_ClientSide 
 {
-
-    public static void ShowOptions()
+    private boolean close = false;
+    private int state;
+    private DataOutputStream dos;
+    private DataInputStream dis;
+    private Socket client;
+    
+    public String receiveFromServer()
+    {
+        String r = "";
+        try
+        {
+            r = dis.readUTF();
+        }
+        catch(IOException e)
+        {
+            System.out.println(e.getMessage() + ": Error receiving from server!");
+        }
+        return r;
+    }
+    
+    public void connectToServer(String address, int port)
+    {
+        try
+        {
+            client = new Socket(address, port);
+            dos = new DataOutputStream(client.getOutputStream());
+            dis = new DataInputStream(client.getInputStream());
+        }
+        catch(IOException e)
+        {
+            System.out.println(e.getMessage() + ": Error connecting to server!");
+        }
+    }
+    
+    public boolean getCloseFlag()
+    {
+        return close;
+    }
+    
+    public void ShowOptions()
     {
         System.out.println("Choose an option:\n1)Check on current balance.\n2)Deposit cash.\n3)Withdraw cash.\n4)Transfer money to another account within the same bank.\n5)Transfer money to another account in another bank.\n6)View transaction history.\n7)Exit.");
     }
-    static int close = 0;
-    static int state;
-    public static void checkServerMessage(String msg, DataInputStream dis, DataOutputStream dos)
+    
+    public void transaction(String amount, String accountID)
     {
-        if (msg.equals("new?login?"))
+        try
+        {
+            while(true)
+            {
+                String serverMessage= this.receiveFromServer();
+                switch(serverMessage)
+                {
+                    case "connected":
+                        dos.writeUTF("server-transfer");
+                        break;
+                    case "amount?account?":
+                        dos.writeUTF(amount + " " + accountID);
+                        break;
+                    case "done":
+                        dos.writeUTF("exit");
+                        break;
+                    case "bye":
+                        return;
+                }
+            }
+        }
+        catch(IOException e)
+        {
+            System.out.println(e.getMessage() + ": Error communicating with another banking system!");
+        }
+    }
+    
+    public void checkServerMessage(String msg)
+    {   
+        if (msg.equals("connected"))
         {
             state = 1; 
             System.out.println("Sign In\nSign Up"); 
         }
-        else if(msg.equals("username?password?deposit?")) // sign up
+        else if(msg.equals("username?amount?"))
         {
             state = 2;
-            System.out.println("Enter Username, Password, Deposit");
+        }
+        else if(msg.equals("details?")) // sign up
+        {
+            state = 2;
+            System.out.println("Enter Username, Password, Telephone, SSN, Amount to deposit");
         }
         else if(msg.equals("username?password?")) //sign in
         {
@@ -35,12 +106,6 @@ public class Client
         {
             state = 4;
             System.out.println("Signed in Successfully!");
-        }
-        else if(msg.equals("notverifiednew"))// error while creating new account
-        {
-            state = 2;
-            System.out.println("ERROR try again!");
-            System.out.println("Enter Username, Password, Deposit");
         }
         else if(msg.equals("notverifiedlogin")) // error while sign in
         {
@@ -53,10 +118,10 @@ public class Client
             state = 5;
             ShowOptions();
         }
-        else if(msg.matches("[0-9].*"))//balance + go back to options
+        else if(msg.matches("[0-9.]*"))//balance + go back to options
         {
             state = 5;
-            System.out.println("Current balane is" + msg);
+            System.out.println("Current balane is: " + msg);
             ShowOptions();
         }
         else if(msg.equals("amount?")) // option 2 deposit
@@ -102,16 +167,17 @@ public class Client
         }
         else if(msg.equals("bye"))
         {
-            close = 1;
+            close = true;
         }
 
     }
 
-    public static void checkClientInput(DataInputStream dis, DataOutputStream dos)
+    public void checkClientInput()
     {   
         try {
             String username; String password;
             String deposit; String toBeSent;
+            String ssn; String telephone;
             String amount; String accountID;
             Scanner m = new Scanner(System.in);
             if (state == 1)
@@ -125,8 +191,10 @@ public class Client
                 Scanner uname = new Scanner(System.in);
                 username = uname.nextLine();
                 password = uname.nextLine();
+                telephone = uname.nextLine();
+                ssn = uname.nextLine();
                 deposit = uname.nextLine();
-                toBeSent = username + "\n" + password + "\n" + deposit;
+                toBeSent = username + "\n" + password + "\n" + telephone + "\n" + ssn + "\n" + deposit;
                 dos.writeUTF(toBeSent);
             }
             else if (state == 3)
@@ -168,8 +236,6 @@ public class Client
                     case 7:
                         dos.writeUTF("exit");
                         break;
-                        
-                          
                 }   
             }
             else if (state == 6)
@@ -199,56 +265,10 @@ public class Client
                 toBeSent = bankname + "\n" + amount + "\n" + accountID;
                 dos.writeUTF(toBeSent);
             }
-                
-            
         }
-        catch (Exception ee)
+        catch (IOException e)
         {
-            System.out.println("Something went wrong");
+            System.out.println(e.getMessage() + "Error sending options to server!");
         }
-
-
     }
-    public static void main(String[] args) {
-
-        try {
-            //1.create client socket and connect to server
-            Socket client = new Socket("127.0.0.1", 1234);
-            //2.creat comm streams
-            DataOutputStream dos = new DataOutputStream(client.getOutputStream());
-            DataInputStream dis = new DataInputStream(client.getInputStream());
-            
-            //3.perform I/O with server
-            //Scanner cin = new Scanner(System.in);
-            while (true) {
-                
-                String serverMessage= dis.readUTF();
-                
-                
-                // Server Message + shkl l output 3l system
-                checkServerMessage(serverMessage,dis,dos);
-                
-                //String userInput = cin.nextLine();
-                // check input from user & send to server
-                checkClientInput(dis,dos);
-                //dos.writeUTF(userInput);
-                
-                //System.out.println("Server Says :" + serverResp);
-                //System.out.println(output);
-                if(close == 1)
-                    break;
-                
-            }
-
-            //4.terminate connection with server
-            //client.close();
-            //dis.close();
-            //dos.close();
-
-        } catch (Exception e) {
-            System.out.println("Something went wrong");
-        }
-        
-    }
-
 }
