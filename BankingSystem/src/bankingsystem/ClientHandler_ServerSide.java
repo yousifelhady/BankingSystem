@@ -15,7 +15,7 @@ public class ClientHandler_ServerSide extends Thread {
     private String option;
     private String ID;
     private boolean exitFlag;
-    private String username_password_deposit;
+    private String details;
     private String amount_to_deposit;
     private String amount_to_withdraw;
     private String amount_account;
@@ -33,6 +33,12 @@ public class ClientHandler_ServerSide extends Thread {
 
     @Override
     public void run() {
+        float balance;
+        String[] DateTime;
+        String timeStamp;
+        String[] HistoryTable = {"AccountID", "Time", "Date", "ProcessType", "Amount"};
+        String[] AccountTableColumns = {"PersonName", "Pw", "Telephone", "SSN", "Balance"};
+        String[] HistoryValues = new String[5];
         try {
             DataInputStream dis = new DataInputStream(clientSocket.getInputStream());
             DataOutputStream dos = new DataOutputStream(clientSocket.getOutputStream());
@@ -55,20 +61,37 @@ public class ClientHandler_ServerSide extends Thread {
             } 
             else if (request_new_login.equals("Sign Up")) {
                 dos.writeUTF("details?");
-                username_password_deposit = dis.readUTF();
-                data = username_password_deposit.split("\n");
-                String[] AccountTableColumns = {"PersonName", "Pw", "Telephone", "SSN", "Balance"};
+                details = dis.readUTF();
+                data = details.split("\n");
                 DatabaseInterface.Insertion("account", AccountTableColumns, data);
-                //DatabaseInterface.
+                ID = DatabaseInterface.GetLastID();
                 dos.writeUTF("verified");
             } 
             else if (request_new_login.equals("server-transfer")) {
                 dos.writeUTF("amount?account?");
-                data = dis.readUTF().split(" ");
-                //data[0] => amount
-                //data[1] => accountID
-                //update database
-                dos.writeUTF("done");
+                data = dis.readUTF().split("\n");
+                if(DatabaseInterface.ValidAccount(Integer.parseInt(data[1])))
+                {
+                    ID = data[1];
+                    CurrentBalance = DatabaseInterface.CheckBalance(ID);
+                    balance = Float.parseFloat(CurrentBalance) + Float.parseFloat(data[0]);
+                    CurrentBalance = String.valueOf(balance);
+                    DatabaseInterface.Update("account", "Balance", CurrentBalance, "ID", ID);
+                    
+                    timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(Calendar.getInstance().getTime());
+                    DateTime = timeStamp.split("_");
+                    
+                    HistoryValues[0] = ID;  HistoryValues[1] = DateTime[1];
+                    HistoryValues[2] = DateTime[0]; HistoryValues[3] = "Deposit";
+                    HistoryValues[4] = amount_to_deposit;
+                    DatabaseInterface.Insertion("history", HistoryTable, HistoryValues);
+                    
+                    dos.writeUTF("done");
+                }
+                else
+                {
+                    dos.writeUTF("errorb");
+                }
             }
             while (!exitFlag) {
                 show_options = dis.readUTF();
@@ -84,15 +107,15 @@ public class ClientHandler_ServerSide extends Thread {
                 }
 
                 option = dis.readUTF();
-                float balance;
-                String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(Calendar.getInstance().getTime());
-                String[] DateTime = timeStamp.split("_");
+                timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(Calendar.getInstance().getTime());
+                DateTime = timeStamp.split("_");
                 switch (option) {
                     case "check":
                         CurrentBalance = DatabaseInterface.CheckBalance(ID);
-                        String[] HistoryTable = {"AccountID", "Time", "Date", "ProcessType", "Amount"};
-                        //String[] HistoryValues = {
-                        //DatabaseInterface.Insertion("history", HistoryTable, data);
+                        HistoryValues[0] = ID;  HistoryValues[1] = DateTime[1];
+                        HistoryValues[2] = DateTime[0]; HistoryValues[3] = "Check balance";
+                        HistoryValues[4] = "";
+                        DatabaseInterface.Insertion("history", HistoryTable, HistoryValues);
                         dos.writeUTF(CurrentBalance);
                         break;
                     case "deposit":
@@ -102,7 +125,10 @@ public class ClientHandler_ServerSide extends Thread {
                         balance = Float.parseFloat(CurrentBalance) + Float.parseFloat(amount_to_deposit);
                         CurrentBalance = String.valueOf(balance);
                         DatabaseInterface.Update("account", "Balance", CurrentBalance, "ID", ID);
-                        
+                        HistoryValues[0] = ID;  HistoryValues[1] = DateTime[1];
+                        HistoryValues[2] = DateTime[0]; HistoryValues[3] = "Deposit";
+                        HistoryValues[4] = amount_to_deposit;
+                        DatabaseInterface.Insertion("history", HistoryTable, HistoryValues);
                         dos.writeUTF(CurrentBalance);
                         break;
                     case "withdraw":
@@ -114,6 +140,10 @@ public class ClientHandler_ServerSide extends Thread {
                         {
                             CurrentBalance = String.valueOf(balance);
                             DatabaseInterface.Update("account", "Balance", CurrentBalance, "ID", ID);
+                            HistoryValues[0] = ID;  HistoryValues[1] = DateTime[1];
+                            HistoryValues[2] = DateTime[0]; HistoryValues[3] = "Withdraw";
+                            HistoryValues[4] = amount_to_withdraw;
+                            DatabaseInterface.Insertion("history", HistoryTable, HistoryValues);
                             dos.writeUTF(CurrentBalance);
                         }
                         else
@@ -136,9 +166,21 @@ public class ClientHandler_ServerSide extends Thread {
                                 newBalanceReceiver = Float.parseFloat(OldBalanceReceiver) + Float.parseFloat(data[0]);
                                 DatabaseInterface.Update("account", "Balance", String.valueOf(newBalanceSender), "ID", ID);
                                 DatabaseInterface.Update("account", "Balance", String.valueOf(newBalanceReceiver), "ID", data[1]);
+                                
+                                HistoryValues[0] = ID;  HistoryValues[1] = DateTime[1];
+                                HistoryValues[2] = DateTime[0]; HistoryValues[3] = "Transfer to " + data[1];
+                                HistoryValues[4] = data[0];
+                                DatabaseInterface.Insertion("history", HistoryTable, HistoryValues);
+                        
+                                HistoryValues[0] = data[1];  HistoryValues[1] = DateTime[1];
+                                HistoryValues[2] = DateTime[0]; HistoryValues[3] = "Transfer from" + ID;
+                                HistoryValues[4] = data[0];
+                                DatabaseInterface.Insertion("history", HistoryTable, HistoryValues);
+                                
                                 dos.writeUTF("done");
                             } 
-                            else {
+                            else 
+                            {
                                 dos.writeUTF("errorb");
                             }
                         } 
@@ -156,9 +198,25 @@ public class ClientHandler_ServerSide extends Thread {
                         {
                             ClientHandler_ClientSide ServerAsclient = new ClientHandler_ClientSide();
                             ServerAsclient.connectToServer("127.0.0.1", 5005);
-                            ServerAsclient.transaction(data[1], data[2]);
-                            //update database
-                            dos.writeUTF("done");
+                            boolean flag = ServerAsclient.transaction(data[1], data[2]);
+                            if(flag)
+                            {
+                                balance = Float.parseFloat(CurrentBalance) - Float.parseFloat(data[1]);
+                                
+                                CurrentBalance = String.valueOf(balance);
+                                DatabaseInterface.Update("account", "Balance", CurrentBalance, "ID", ID);
+                                
+                                HistoryValues[0] = ID;  HistoryValues[1] = DateTime[1];
+                                HistoryValues[2] = DateTime[0]; HistoryValues[3] = "Transfer to " + data[2] + " in " + data[0] + " bank";
+                                HistoryValues[4] = data[1];
+                                DatabaseInterface.Insertion("history", HistoryTable, HistoryValues);
+                            
+                                dos.writeUTF("done");
+                            }
+                            else
+                            {
+                                dos.writeUTF("errorb");
+                            }
                         } 
                         else {
                             dos.writeUTF("errorb");

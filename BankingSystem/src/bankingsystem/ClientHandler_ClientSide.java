@@ -52,7 +52,7 @@ public class ClientHandler_ClientSide
         System.out.println("Choose an option:\n1)Check on current balance.\n2)Deposit cash.\n3)Withdraw cash.\n4)Transfer money to another account within the same bank.\n5)Transfer money to another account in another bank.\n6)View transaction history.\n7)Exit.");
     }
     
-    public void transaction(String amount, String accountID)
+    public boolean transaction(String amount, String accountID)
     {
         try
         {
@@ -65,13 +65,15 @@ public class ClientHandler_ClientSide
                         dos.writeUTF("server-transfer");
                         break;
                     case "amount?account?":
-                        dos.writeUTF(amount + " " + accountID);
+                        dos.writeUTF(amount + "\n" + accountID);
                         break;
                     case "done":
                         dos.writeUTF("exit");
                         break;
+                    case "errorb":
+                        return false;
                     case "bye":
-                        return;
+                        return true;
                 }
             }
         }
