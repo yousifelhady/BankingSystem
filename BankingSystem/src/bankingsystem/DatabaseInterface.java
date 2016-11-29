@@ -45,9 +45,9 @@ public class DatabaseInterface
     }
     
     //Get user incremental ID
-    public static int GetLastID ()
+    public static String GetLastID ()
     {
-        int res = 0;
+        String res = "";
         try {
             String query = "SELECT ID FROM account ORDER BY ID DESC LIMIT 1";
             preparedStmt = conn.prepareStatement(query);
@@ -55,7 +55,7 @@ public class DatabaseInterface
             ResultSet rs = st.executeQuery(query);
             while(rs.next())
             {
-                res = rs.getInt("ID");
+                res = rs.getString("ID");
             }
         }
         catch (SQLException e) {
