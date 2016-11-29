@@ -141,15 +141,17 @@ public class ClientHandler_ClientSide
         }
         else if(msg.equals("invalidid"))
         {
-            state = 8;
-            System.out.println("Invalid account ID! Try Again.");
-            System.out.println("Please enter the amount to be transfered and the account id");
+            //state = 8;
+            state = 4 ;
+            System.out.println("Invalid account ID!");
+            //.out.println("Please enter the amount to be transfered and the account id");
         }
         else if(msg.equals("errorb"))
         {
-            state = 8;
-            System.out.println("Cannot transfer this amount! Try Again.");
-            System.out.println("Please enter the amount to be transfered and the account id");
+            //state = 8;
+            state = 4 ;
+            System.out.println("Cannot transfer this amount!.");
+            //System.out.println("Please enter the amount to be transfered and the account id");
         }
         else if(msg.equals("done"))
         {
@@ -161,6 +163,11 @@ public class ClientHandler_ClientSide
             state = 9;
             System.out.println("Please enter the Bank name , the amount to be transfered and the account id");
         }
+        else if (msg.equals("errorw"))
+        {
+            state = 4 ;
+            System.out.println("Your Current Balance is not enough!!!");
+        }
         else if((msg.substring(0,1)).matches("#"))
         {
             System.out.println(msg);
@@ -169,9 +176,7 @@ public class ClientHandler_ClientSide
         {
             close = true;
         }
-
     }
-
     public void checkClientInput()
     {   
         try {
