@@ -121,7 +121,13 @@ public class DatabaseInterface
     public static void Insertion (String tname, String[] column, String[] value)
     {
         String tmpColumn = column[0];
-        String tmpValue = "\'" + value[0] + "\'";
+        String tmpValue;
+        if (column[0].equals("ID")) {
+            tmpValue = value[0];
+        }
+        else {
+            tmpValue = "\'" + value[0] + "\'";
+        }
         for (int i = 1 ; i < column.length ; i++)
         {
             tmpColumn += ", " + column[i];
@@ -134,11 +140,6 @@ public class DatabaseInterface
         try {
             //create the mysql insert preparedstatement
             preparedStmt = conn.prepareStatement(query);
-            
-//            for (int i = 0 ; i < column.length ; i++)
-//            {
-//                preparedStmt.setString (i, value[i]);
-//            }
             
             //execute the preparedstatement
             preparedStmt.execute();
@@ -256,5 +257,32 @@ public class DatabaseInterface
             System.err.println(e.getMessage());
         }
         return hist;
+    }
+    
+    //get bank IP & port
+    public static String[] GetBankIP (String bankName)
+    {
+        String []res = new String [2];
+        String query = "SELECT SeverIP AND ServerPort FROM bank WHERE Name =" + bankName;
+        try {
+            //create the mysql insert preparedstatement
+            preparedStmt = conn.prepareStatement(query); 
+            Statement st = conn.createStatement();
+            ResultSet rs = st.executeQuery(query);
+            
+            ResultSetMetaData rsmd = rs.getMetaData();
+            int columnsNumber = rsmd.getColumnCount();
+            
+            while (rs.next()) {
+                for(int i = 1; i < columnsNumber; i++)
+                    res[i-1] = rs.getString(i);
+            }
+        }
+        catch (SQLException e)
+        {
+            System.err.println("Got an exception!");
+            System.err.println(e.getMessage());
+        }
+        return res;
     }
 }
