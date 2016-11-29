@@ -197,7 +197,8 @@ public class ClientHandler_ServerSide extends Thread {
                         if(Float.parseFloat(CurrentBalance) >= Float.parseFloat(data[1]))
                         {
                             ClientHandler_ClientSide ServerAsclient = new ClientHandler_ClientSide();
-                            ServerAsclient.connectToServer("127.0.0.1", 5005);
+                            String[] ip_port = DatabaseInterface.GetBankIP(data[0]);
+                            ServerAsclient.connectToServer(ip_port[0], Integer.parseInt(ip_port[1]));
                             boolean flag = ServerAsclient.transaction(data[1], data[2]);
                             if(flag)
                             {
@@ -223,8 +224,11 @@ public class ClientHandler_ServerSide extends Thread {
                         }
                         break;
                     case "view":
-                        //check database for history
-                        //dos.writeUTF(#history);
+                        String[] id = {"ID"};
+                        String[] id_value = {ID};
+                        String[] _HistoryTable_ = {"Time", "Date", "ProcessType", "Amount"};
+                        String output = DatabaseInterface.GetHistory(_HistoryTable_, id, id_value);
+                        dos.writeUTF("#" + output);
                         break;
                     case "exit":
                         dos.writeUTF("bye");
