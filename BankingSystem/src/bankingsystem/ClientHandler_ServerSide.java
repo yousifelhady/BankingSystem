@@ -70,6 +70,7 @@ public class ClientHandler_ServerSide extends Thread {
             while (!exitFlag) {
                 show_options = dis.readUTF();
                 if (show_options.equals("exit")) {
+                    dos.writeUTF("bye");
                     clientSocket.close();
                     dis.close();
                     dos.close();
@@ -100,9 +101,16 @@ public class ClientHandler_ServerSide extends Thread {
                         amount_to_withdraw = dis.readUTF();
                         CurrentBalance = DatabaseInterface.CheckBalance(ID);
                         balance = Float.parseFloat(CurrentBalance) - Float.parseFloat(amount_to_withdraw);
-                        CurrentBalance = String.valueOf(balance);
-                        DatabaseInterface.Update("account", "Balance", CurrentBalance, "ID", ID);
-                        dos.writeUTF(CurrentBalance);
+                        if(balance > 0)
+                        {
+                            CurrentBalance = String.valueOf(balance);
+                            DatabaseInterface.Update("account", "Balance", CurrentBalance, "ID", ID);
+                            dos.writeUTF(CurrentBalance);
+                        }
+                        else
+                        {
+                            dos.writeUTF("errorw");
+                        }
                         break;
                     case "transfersame":
                         dos.writeUTF("amount?account?");
@@ -132,26 +140,20 @@ public class ClientHandler_ServerSide extends Thread {
                     case "transferother":
                         dos.writeUTF("bankname?amount?account?");
                         bank_amount_account = dis.readUTF();
-                        data = bank_amount_account.split(" ");
-                        //check database for validity of account
-                        /*if (//valid account)    
-                             {
-                            //check database if balance is enough for tansfer
-                            if (//enough)
-                                 {
-                                ClientHandler_ClientSide ServerAsclient = new ClientHandler_ClientSide();
-                                ServerAsclient.connectToServer("127.0.0.1", 5005);
-                                ServerAsclient.transaction(data[1], data[2]);
-                                //update database
-                                dos.writeUTF("done");
-                            } 
-                            else {
-                                dos.writeUTF("errorb");
-                            }
+                        data = bank_amount_account.split("\n");
+                        CurrentBalance = DatabaseInterface.CheckBalance(ID);
+                        
+                        if(Float.parseFloat(CurrentBalance) >= Float.parseFloat(data[1]))
+                        {
+                            ClientHandler_ClientSide ServerAsclient = new ClientHandler_ClientSide();
+                            ServerAsclient.connectToServer("127.0.0.1", 5005);
+                            ServerAsclient.transaction(data[1], data[2]);
+                            //update database
+                            dos.writeUTF("done");
                         } 
                         else {
-                            dos.writeUTF("invalidid");
-                        }*/
+                            dos.writeUTF("errorb");
+                        }
                         break;
                     case "view":
                         //check database for history
@@ -163,7 +165,7 @@ public class ClientHandler_ServerSide extends Thread {
                         clientSocket.close();
                         dis.close();
                         dos.close();
-                        break;
+                        return;
                 }
             }
         } 
