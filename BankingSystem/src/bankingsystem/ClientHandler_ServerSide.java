@@ -22,13 +22,11 @@ public class ClientHandler_ServerSide extends Thread {
     private String[] data;
     private String bank_amount_account;
     private String CurrentBalance;
-    //DatabaseInterface di;
-    
 
     public ClientHandler_ServerSide(Socket s) {
         this.clientSocket = s;
         this.exitFlag = false;
-        DatabaseInterface.Init("jdbc:mysql://127.0.0.1:3306/BankingSystem", "root", "u1234q-a-z");
+        DatabaseInterface.Init("jdbc:mysql://192.168.1.107:3306/bankingsystem", "mickey", "abc123!@#");
     }
 
     @Override
@@ -82,7 +80,7 @@ public class ClientHandler_ServerSide extends Thread {
                     DateTime = timeStamp.split("_");
                     
                     HistoryValues[0] = ID;  HistoryValues[1] = DateTime[1];
-                    HistoryValues[2] = DateTime[0]; HistoryValues[3] = "Deposit";
+                    HistoryValues[2] = DateTime[0]; HistoryValues[3] = "Transfer from another bank";
                     HistoryValues[4] = amount_to_deposit;
                     DatabaseInterface.Insertion("history", HistoryTable, HistoryValues);
                     
@@ -173,7 +171,7 @@ public class ClientHandler_ServerSide extends Thread {
                                 DatabaseInterface.Insertion("history", HistoryTable, HistoryValues);
                         
                                 HistoryValues[0] = data[1];  HistoryValues[1] = DateTime[1];
-                                HistoryValues[2] = DateTime[0]; HistoryValues[3] = "Transfer from" + ID;
+                                HistoryValues[2] = DateTime[0]; HistoryValues[3] = "Transfer from " + ID;
                                 HistoryValues[4] = data[0];
                                 DatabaseInterface.Insertion("history", HistoryTable, HistoryValues);
                                 

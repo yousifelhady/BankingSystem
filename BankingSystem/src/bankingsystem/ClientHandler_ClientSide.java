@@ -81,6 +81,7 @@ public class ClientHandler_ClientSide
         {
             System.out.println(e.getMessage() + ": Error communicating with another banking system!");
         }
+        return false;
     }
     
     public void checkServerMessage(String msg)
