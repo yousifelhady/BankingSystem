@@ -81,7 +81,7 @@ public class ClientHandler_ServerSide extends Thread {
                     
                     HistoryValues[0] = ID;  HistoryValues[1] = DateTime[1];
                     HistoryValues[2] = DateTime[0]; HistoryValues[3] = "Transfer from another bank";
-                    HistoryValues[4] = amount_to_deposit;
+                    HistoryValues[4] = data[0];
                     DatabaseInterface.Insertion("history", HistoryTable, HistoryValues);
                     
                     dos.writeUTF("done");

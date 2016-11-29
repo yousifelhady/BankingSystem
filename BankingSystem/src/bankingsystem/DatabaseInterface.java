@@ -260,7 +260,7 @@ public class DatabaseInterface
     public static String[] GetBankIP (String bankName)
     {
         String []res = new String [2];
-        String query = "SELECT SeverIP, ServerPort FROM bank WHERE Name =" + bankName;
+        String query = "SELECT ServerIP, ServerPort FROM bank WHERE Name =\'" + bankName + "\'";
         try {
             //create the mysql insert preparedstatement
             preparedStmt = conn.prepareStatement(query); 
