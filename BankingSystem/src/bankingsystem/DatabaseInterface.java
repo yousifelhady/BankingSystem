@@ -213,7 +213,7 @@ public class DatabaseInterface
         String tmp = "";
         String tmpColumn = column[0];
         String hist = "";
-        if (attr.equals("AccountID")) {
+        if (attr[0].equals("AccountID")) {
             tmp = "(" + attr[0] + " = " + attrValue[0];
         }
         else {
@@ -221,20 +221,17 @@ public class DatabaseInterface
         }
         for (int i = 1 ; i < column.length ; i++)
         {
-            tmpColumn += " AND " + column[i];
+            tmpColumn += ", " + column[i];
         }
         for (int j = 1; j < attr.length; j++) {
-            if (attr.equals("AccountID")) {
+            if (attr[0].equals("AccountID")) {
                 tmp += " AND " + attr[j] + " = " + attrValue[j];
             }
             else {
                 tmp += " AND " + attr[j] + " = \'" + attrValue[j] + "\'";
             }
-            if (j == column.length - 1)
-            {
-                tmp += " )";
-            } 
         }
+        tmp += ")";
         String query = "SELECT "+ tmpColumn + " FROM history WHERE " + tmp;
         try {
             //create the mysql insert preparedstatement
@@ -246,9 +243,9 @@ public class DatabaseInterface
             int columnsNumber = rsmd.getColumnCount();
             
             while (rs.next()) {
-                for(int i = 1; i < columnsNumber; i++)
-                    hist += rs.getString(i) + "\t";
-                System.out.println();
+                for(int i = 1; i <= columnsNumber; i++)
+                    hist += rs.getString(i) + "\t\t\t";
+                hist += "\r\n";
             }
         }
         catch (SQLException e)

@@ -76,7 +76,7 @@ public class ClientHandler_ServerSide extends Thread {
                     CurrentBalance = String.valueOf(balance);
                     DatabaseInterface.Update("account", "Balance", CurrentBalance, "ID", ID);
                     
-                    timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(Calendar.getInstance().getTime());
+                    timeStamp = new SimpleDateFormat("yyyy-MM-dd_HH:mm:ss").format(Calendar.getInstance().getTime());
                     DateTime = timeStamp.split("_");
                     
                     HistoryValues[0] = ID;  HistoryValues[1] = DateTime[1];
@@ -222,7 +222,7 @@ public class ClientHandler_ServerSide extends Thread {
                         }
                         break;
                     case "view":
-                        String[] id = {"ID"};
+                        String[] id = {"AccountID"};
                         String[] id_value = {ID};
                         String[] _HistoryTable_ = {"Time", "Date", "ProcessType", "Amount"};
                         String output = DatabaseInterface.GetHistory(_HistoryTable_, id, id_value);

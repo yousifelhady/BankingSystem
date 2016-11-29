@@ -173,7 +173,7 @@ public class ClientHandler_ClientSide
         }
         else if((msg.substring(0,1)).matches("#"))
         {
-            System.out.println(msg);
+            System.out.println(msg.substring(1,msg.length()-1));
         }
         else if(msg.equals("bye"))
         {
