@@ -260,7 +260,7 @@ public class DatabaseInterface
     public static String[] GetBankIP (String bankName)
     {
         String []res = new String [2];
-        String query = "SELECT SeverIP AND ServerPort FROM bank WHERE Name =" + bankName;
+        String query = "SELECT SeverIP, ServerPort FROM bank WHERE Name =" + bankName;
         try {
             //create the mysql insert preparedstatement
             preparedStmt = conn.prepareStatement(query); 
@@ -271,7 +271,7 @@ public class DatabaseInterface
             int columnsNumber = rsmd.getColumnCount();
             
             while (rs.next()) {
-                for(int i = 1; i < columnsNumber; i++)
+                for(int i = 1; i <= columnsNumber; i++)
                     res[i-1] = rs.getString(i);
             }
         }
