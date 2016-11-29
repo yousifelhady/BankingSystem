@@ -30,10 +30,11 @@ public class DatabaseInterface
             while(rs.next())
             {
                 res = rs.getInt("ID");
+                if (res == AccountID) {
+                    return true;
+                }
             }
-            if (res == AccountID) {
-                return true;
-            }
+            
         }
         catch (Exception e) {
             System.err.println("Got an exception!");

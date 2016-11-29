@@ -120,9 +120,9 @@ public class ClientHandler_ClientSide
         }
         else if(msg.matches("[0-9.]*"))//balance + go back to options
         {
-            state = 5;
+            state = 4;
             System.out.println("Current balane is: " + msg);
-            ShowOptions();
+            //ShowOptions();
         }
         else if(msg.equals("amount?")) // option 2 deposit
         {
@@ -153,8 +153,8 @@ public class ClientHandler_ClientSide
         }
         else if(msg.equals("done"))
         {
-            state = 5;
-            ShowOptions();
+            state = 4;
+            //ShowOptions();
         }
         else if(msg.equals("bankname?amount?account?")) // option 5 transfer to another bank
         {
