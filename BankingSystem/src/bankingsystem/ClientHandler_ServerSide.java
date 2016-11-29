@@ -3,6 +3,8 @@ package bankingsystem;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.net.*;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
 
 public class ClientHandler_ServerSide extends Thread {
 
@@ -57,6 +59,7 @@ public class ClientHandler_ServerSide extends Thread {
                 data = username_password_deposit.split("\n");
                 String[] AccountTableColumns = {"PersonName", "Pw", "Telephone", "SSN", "Balance"};
                 DatabaseInterface.Insertion("account", AccountTableColumns, data);
+                //DatabaseInterface.
                 dos.writeUTF("verified");
             } 
             else if (request_new_login.equals("server-transfer")) {
@@ -82,9 +85,14 @@ public class ClientHandler_ServerSide extends Thread {
 
                 option = dis.readUTF();
                 float balance;
+                String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(Calendar.getInstance().getTime());
+                String[] DateTime = timeStamp.split("_");
                 switch (option) {
                     case "check":
                         CurrentBalance = DatabaseInterface.CheckBalance(ID);
+                        String[] HistoryTable = {"AccountID", "Time", "Date", "ProcessType", "Amount"};
+                        //String[] HistoryValues = {
+                        //DatabaseInterface.Insertion("history", HistoryTable, data);
                         dos.writeUTF(CurrentBalance);
                         break;
                     case "deposit":
@@ -94,6 +102,7 @@ public class ClientHandler_ServerSide extends Thread {
                         balance = Float.parseFloat(CurrentBalance) + Float.parseFloat(amount_to_deposit);
                         CurrentBalance = String.valueOf(balance);
                         DatabaseInterface.Update("account", "Balance", CurrentBalance, "ID", ID);
+                        
                         dos.writeUTF(CurrentBalance);
                         break;
                     case "withdraw":
