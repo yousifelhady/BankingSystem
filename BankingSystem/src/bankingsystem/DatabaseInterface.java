@@ -247,7 +247,7 @@ public class DatabaseInterface
             
             while (rs.next()) {
                 for(int i = 1; i < columnsNumber; i++)
-                    hist += rs.getString(i) + " ";
+                    hist += rs.getString(i) + "\t";
                 System.out.println();
             }
         }
