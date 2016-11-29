@@ -44,10 +44,10 @@ public class DatabaseInterface
         return false;
     }
     
-    //Get user incremental ID using telephone number
-    public static String GetLastID ()
+    //Get user incremental ID
+    public static int GetLastID ()
     {
-        String res = "";
+        int res = 0;
         try {
             String query = "SELECT ID FROM account ORDER BY ID DESC LIMIT 1";
             preparedStmt = conn.prepareStatement(query);
@@ -55,7 +55,7 @@ public class DatabaseInterface
             ResultSet rs = st.executeQuery(query);
             while(rs.next())
             {
-                res = rs.getString("ID");
+                res = rs.getInt("ID");
             }
         }
         catch (SQLException e) {
