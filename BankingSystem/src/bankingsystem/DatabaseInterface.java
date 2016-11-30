@@ -205,8 +205,8 @@ public class DatabaseInterface
             int columnsNumber = rsmd.getColumnCount();
             while (rs.next()) {
                 for(int i = 1; i <= columnsNumber; i++)
-                    hist += rs.getString(i) + "\t\t\t";
-                hist += "\r\n";
+                    hist += rs.getString(i) + "=";
+                hist += "\n";
             }
         }
         catch (SQLException e)

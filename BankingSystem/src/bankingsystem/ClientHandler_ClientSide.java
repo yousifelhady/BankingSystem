@@ -190,8 +190,13 @@ public class ClientHandler_ClientSide
         }
         else if((msg.substring(0,1)).matches("#"))
         {
-            //state = 4;
-            System.out.println(msg.substring(1,msg.length()-1));
+            msg = msg.substring(1,msg.length()-1);
+            String[] lines = msg.split("\n");
+            for(int i = 0; i < lines.length; i++)
+            {
+                String[] segments = lines[i].split("=");
+                System.out.println(String.format("%-20s %-20s %-50s %-20s" , segments[0], segments[1], segments[2], segments[3]));
+            }
             GUI();
             
         }
