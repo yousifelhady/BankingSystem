@@ -51,6 +51,25 @@ public class ClientHandler_ClientSide
     {
         System.out.println("Choose an option:\n1)Check on current balance.\n2)Deposit cash.\n3)Withdraw cash.\n4)Transfer money to another account within the same bank.\n5)Transfer money to another account in another bank.\n6)View transaction history.\n7)Exit.");
     }
+    public void GUI()
+    {
+        boolean loopAgain = false ;
+        while (loopAgain)
+        {
+            System.out.println("1)Back to options menu 2)Exit");
+                Scanner choice = new Scanner(System.in);
+                String c = choice.nextLine();
+                
+                if (c.equals("1")) state = 4;
+                else if(c.equals("2")) close = true;
+                else
+                {
+                    System.out.println("wrong entry, please try again");
+                    loopAgain =true;
+                }
+        }
+    }
+    
     
     public boolean transaction(String amount, String accountID)
     {
@@ -89,7 +108,7 @@ public class ClientHandler_ClientSide
         if (msg.equals("connected"))
         {
             state = 1; 
-            System.out.println("Sign In\nSign Up"); 
+            System.out.println("1)Sign In\n2)Sign Up"); 
         }
         else if(msg.equals("username?amount?"))
         {
@@ -123,9 +142,10 @@ public class ClientHandler_ClientSide
         }
         else if(msg.matches("[0-9.]*"))//balance + go back to options
         {
-            state = 4;
+            //state = 4;
             System.out.println("Current balane is: " + msg);
-            //ShowOptions();
+            GUI();
+           
         }
         else if(msg.equals("amount?")) // option 2 deposit
         {
@@ -144,7 +164,6 @@ public class ClientHandler_ClientSide
         }
         else if(msg.equals("invalidid"))
         {
-            //state = 8;
             state = 4 ;
             System.out.println("Invalid account ID!");
             //.out.println("Please enter the amount to be transfered and the account id");
@@ -158,8 +177,7 @@ public class ClientHandler_ClientSide
         }
         else if(msg.equals("done"))
         {
-            state = 4;
-            //ShowOptions();
+            GUI();
         }
         else if(msg.equals("bankname?amount?account?")) // option 5 transfer to another bank
         {
@@ -192,7 +210,14 @@ public class ClientHandler_ClientSide
             {
                Scanner uinput = new Scanner(System.in);
                String userInput = uinput.nextLine();
-               dos.writeUTF(userInput); // sign in or sign up // to be sent to server
+               if (userInput.equals("1"))
+               {    
+                  dos.writeUTF("Sign In");
+               }
+               else if (userInput.equals("2"))
+               {
+                   dos.writeUTF("Sign Up");
+               }
             }
             else if (state == 2) // sign up
             {
@@ -243,6 +268,11 @@ public class ClientHandler_ClientSide
                         break;
                     case 7:
                         dos.writeUTF("exit");
+                        break;
+                    default:
+                        System.out.println("wrong entry, please try again");
+                        dos.writeUTF("showoptions");
+                        //ShowOptions();
                         break;
                 }   
             }
