@@ -143,7 +143,6 @@ public class ClientHandler_ClientSide
         }
         else if(msg.matches("[0-9.]*"))//balance + go back to options
         {
-            //state = 4;
             System.out.println("Current balane is: " + msg);
             GUI();
            
@@ -171,13 +170,12 @@ public class ClientHandler_ClientSide
         }
         else if(msg.equals("errorb"))
         {
-            //state = 8;
             state = 4 ;
-            System.out.println("Cannot transfer this amount!.");
-            //System.out.println("Please enter the amount to be transfered and the account id");
+            System.out.println("Cannot transfer this amount!");
         }
         else if(msg.equals("done"))
         {
+            System.out.println("Transaction is done.");
             GUI();
         }
         else if(msg.equals("bankname?amount?account?")) // option 5 transfer to another bank
@@ -188,7 +186,7 @@ public class ClientHandler_ClientSide
         else if (msg.equals("errorw"))
         {
             state = 4 ;
-            System.out.println("Your Current Balance is not enough!!!");
+            System.out.println("Your Current Balance is not enough!");
         }
         else if((msg.substring(0,1)).matches("#"))
         {
