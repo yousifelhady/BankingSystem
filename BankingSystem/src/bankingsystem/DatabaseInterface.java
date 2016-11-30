@@ -6,7 +6,7 @@ public class DatabaseInterface
     private static PreparedStatement preparedStmt;
     private static Connection conn;
     
-    public static void Init (String url, String username, String pw)
+    public synchronized static void Init (String url, String username, String pw)
     {
         try {
             String myDriver = "com.mysql.jdbc.Driver";
@@ -18,7 +18,7 @@ public class DatabaseInterface
         }
     }
 
-    public static boolean ValidAccount (int AccountID)
+    public synchronized static boolean ValidAccount (int AccountID)
     {
         int res;
         try {
@@ -40,7 +40,7 @@ public class DatabaseInterface
         return false;
     }
 
-    public static String GetLastID ()
+    public synchronized static String GetLastID ()
     {
         String res = "";
         try {
@@ -54,13 +54,12 @@ public class DatabaseInterface
             }
         }
         catch (SQLException e) {
-            System.err.println("Got an exception!");
-            System.err.println(e.getMessage());
+            System.out.println(e.getMessage() + "Error in getting ID after sign up!");
         }
         return res;
     }
 
-    public static boolean Authentication (String AccountID, String pw)
+    public synchronized static boolean Authentication (String AccountID, String pw)
     {
         try {
             String query = "SELECT Pw FROM account WHERE ID = " + AccountID;
@@ -87,7 +86,7 @@ public class DatabaseInterface
         return false;
     }
 
-    public static String CheckBalance (String AccountID)
+    public synchronized static String CheckBalance (String AccountID)
     {
         String res = "";
         try {
@@ -106,7 +105,7 @@ public class DatabaseInterface
         return res;
     }
 
-    public static void Insertion (String tname, String[] column, String[] value)
+    public synchronized static void Insertion (String tname, String[] column, String[] value)
     {
         String tmpColumn = column[0];
         String tmpValue;
@@ -135,7 +134,7 @@ public class DatabaseInterface
         }
     }
 
-    public static void Update (String tname, String[] column, String[] value, String key, String keyValue)
+    public synchronized static void Update (String tname, String[] column, String[] value, String key, String keyValue)
     {
         String tmpColumn = column[0];
         String tmpValue = "\'" + value[0] + "\'";
@@ -158,7 +157,7 @@ public class DatabaseInterface
         }
     }
     
-    public static void Update (String tname, String column, String value, String key, String keyValue)
+    public synchronized static void Update (String tname, String column, String value, String key, String keyValue)
     {
         String query = "UPDATE " + tname + " SET " + column 
         + " = " + value + " WHERE " + key + " = " + keyValue;
@@ -173,7 +172,7 @@ public class DatabaseInterface
         }
     }
 
-    public static String GetHistory (String[] column, String[] attr, String[] attrValue)
+    public synchronized static String GetHistory (String[] column, String[] attr, String[] attrValue)
     {
         String tmp;
         String tmpColumn = column[0];
@@ -217,7 +216,7 @@ public class DatabaseInterface
         return hist;
     }
 
-    public static String[] GetBankIP (String bankName)
+    public synchronized static String[] GetBankIP (String bankName)
     {
         String []res = new String [2];
         String query = "SELECT ServerIP, ServerPort FROM bank WHERE Name =\'" + bankName + "\'";
