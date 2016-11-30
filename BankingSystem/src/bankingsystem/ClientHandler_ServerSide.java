@@ -20,7 +20,7 @@ public class ClientHandler_ServerSide extends Thread {
         this.clientSocket = s;
         this.exitFlag = false;
         this.Bank = "CIB";
-        DatabaseInterface.Init("jdbc:mysql://127.0.0.1:3306/BankingSystem", "root", "u1234q-a-z");
+        DatabaseInterface.Init("jdbc:mysql://127.0.0.1:3306/BankingSystem?autoReconnect=true&useSSL=false", "root", "u1234q-a-z");
     }
     
     private String[] getTimeStamp()
