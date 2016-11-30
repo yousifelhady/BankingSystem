@@ -53,20 +53,21 @@ public class ClientHandler_ClientSide
     }
     public void GUI()
     {
-        boolean loopAgain = false ;
+        boolean loopAgain = true;
         while (loopAgain)
         {
-            System.out.println("1)Back to options menu 2)Exit");
-                Scanner choice = new Scanner(System.in);
-                String c = choice.nextLine();
+            loopAgain=false;
+            System.out.println("1)Back to options menu \n2)Exit");
+            Scanner choice = new Scanner(System.in);
+            String c = choice.nextLine();
                 
-                if (c.equals("1")) state = 4;
-                else if(c.equals("2")) close = true;
-                else
-                {
-                    System.out.println("wrong entry, please try again");
-                    loopAgain =true;
-                }
+            if (c.equals("1")) state = 4;
+            else if(c.equals("2")) close = true;
+            else
+            {
+                System.out.println("wrong entry, please try again");
+                loopAgain =true;
+            }
         }
     }
     
@@ -191,7 +192,10 @@ public class ClientHandler_ClientSide
         }
         else if((msg.substring(0,1)).matches("#"))
         {
+            //state = 4;
             System.out.println(msg.substring(1,msg.length()-1));
+            GUI();
+            
         }
         else if(msg.equals("bye"))
         {
@@ -205,19 +209,30 @@ public class ClientHandler_ClientSide
             String deposit; String toBeSent;
             String ssn; String telephone;
             String amount; String accountID;
+            boolean loop = true;
             Scanner m = new Scanner(System.in);
             if (state == 1)
             {
                Scanner uinput = new Scanner(System.in);
-               String userInput = uinput.nextLine();
-               if (userInput.equals("1"))
-               {    
-                  dos.writeUTF("Sign In");
-               }
-               else if (userInput.equals("2"))
+               
+               while(loop)
                {
-                   dos.writeUTF("Sign Up");
-               }
+                    String userInput = uinput.nextLine();
+                    if(userInput.equals("1"))
+                    {    
+                        dos.writeUTF("Sign In");loop=false;
+                    }
+                    else if (userInput.equals("2"))
+                    {
+                        dos.writeUTF("Sign Up");loop=false;
+                    }
+                    else
+                    {
+                        System.out.println("wrong entry, please try again");
+                        System.out.println("1)Sign In\n2)Sign Up");
+                        loop=true;
+                    }
+               }                   
             }
             else if (state == 2) // sign up
             {
@@ -245,8 +260,11 @@ public class ClientHandler_ClientSide
             else if (state == 5)
             {
                 Scanner opno = new Scanner(System.in);
-                int OptionNo = opno.nextInt();
-                switch (OptionNo)
+                String OptionNo = opno.nextLine();
+                if (OptionNo.matches("[0-9]+"))
+                {
+                    
+                    switch (Integer.parseInt(OptionNo))
                 {
                     case 1:
                         dos.writeUTF("check");
@@ -272,9 +290,16 @@ public class ClientHandler_ClientSide
                     default:
                         System.out.println("wrong entry, please try again");
                         dos.writeUTF("showoptions");
+                        
                         //ShowOptions();
                         break;
-                }   
+                }  
+                }
+                else
+                {
+                 System.out.println("wrong entry, please try again");
+                        dos.writeUTF("showoptions");   
+                }
             }
             else if (state == 6)
             {

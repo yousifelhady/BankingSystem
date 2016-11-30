@@ -10,7 +10,7 @@ import java.util.Calendar;
 public class ClientHandler_ServerSide extends Thread {
 
     private final Socket clientSocket;
-    private final String ID;
+    private String ID;
     private final String Bank; 
     private DataInputStream dis;
     private DataOutputStream dos;
@@ -227,6 +227,8 @@ public class ClientHandler_ServerSide extends Thread {
             String[] AccountTableColumns = {"PersonName", "Pw", "Telephone", "SSN", "Balance"};
             DatabaseInterface.Insertion("account", AccountTableColumns, data);
             ID = DatabaseInterface.GetLastID();
+            String[] timeDate = getTimeStamp();
+            historyUpdate(ID, timeDate[1], timeDate[0], "Create an account and deposit", data[4]);
             dos.writeUTF("verified");
         }
         catch(IOException e)
@@ -315,7 +317,7 @@ public class ClientHandler_ServerSide extends Thread {
                         dos.close();
                         return;
                     default:
-                        dos.writeUTF("errorb");
+                        dos.writeUTF("options");
                         break;
                 }
             }

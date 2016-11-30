@@ -11,8 +11,9 @@ public class BankClient
         {
             String serverMessage= client.receiveFromServer();
             client.checkServerMessage(serverMessage);
-            client.checkClientInput();
-            if(client.getCloseFlag())
+            if(!client.getCloseFlag())
+                client.checkClientInput();
+            else
                 break;
         }
     }
