@@ -14,7 +14,10 @@ public class BankClient
             if(!client.getCloseFlag())
                 client.checkClientInput();
             else
+            {
+                System.out.println("Connection with bank server is closed!");
                 break;
+            }
         }
     }
 }
