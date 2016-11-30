@@ -9,21 +9,18 @@ public class DatabaseInterface
     public static void Init (String url, String username, String pw)
     {
         try {
-            // create a mysql database connection
             String myDriver = "com.mysql.jdbc.Driver";
             Class.forName(myDriver);
             conn = DriverManager.getConnection(url, username, pw);
         }
         catch (Exception e) {
-            System.err.println("Got an exception!");
-            System.err.println(e.getMessage());
+            System.out.println(e.getMessage() + "Error connecting to database!");
         }
     }
-    
-    //check account validity
+
     public static boolean ValidAccount (int AccountID)
     {
-        int res = 0;
+        int res;
         try {
             String query = "SELECT ID FROM account";
             preparedStmt = conn.prepareStatement(query);
@@ -38,13 +35,11 @@ public class DatabaseInterface
             }
         }
         catch (SQLException e) {
-            System.err.println("Got an exception!");
-            System.err.println(e.getMessage());
+            System.out.println(e.getMessage() + "Error during checking validity of an account!");
         }
         return false;
     }
-    
-    //Get user incremental ID
+
     public static String GetLastID ()
     {
         String res = "";
@@ -64,17 +59,14 @@ public class DatabaseInterface
         }
         return res;
     }
-    
-    //check authentication
+
     public static boolean Authentication (String AccountID, String pw)
     {
         try {
             String query = "SELECT Pw FROM account WHERE ID = " + AccountID;
             preparedStmt = conn.prepareStatement(query);
-            //preparedStmt.setString (1, AccountID);
             Statement st = conn.createStatement();
             ResultSet rs = st.executeQuery(query);
-            //System.out.println(rs);
             String res = "";
             while(rs.next())
             {
@@ -90,19 +82,17 @@ public class DatabaseInterface
             }
         }
             catch (SQLException e) {
-            System.out.println(e.getMessage() + "Got an exception!");
+            System.out.println(e.getMessage() + "Error during authentication!");
         }
         return false;
     }
-    
-    //check balance
+
     public static String CheckBalance (String AccountID)
     {
         String res = "";
         try {
             String query = "SELECT Balance FROM account WHERE ID =" + AccountID;
             preparedStmt = conn.prepareStatement(query);
-            //preparedStmt.setInt(1, Integer.parseInt(AccountID));
             Statement st = conn.createStatement();
             ResultSet rs = st.executeQuery(query);
             while(rs.next())
@@ -111,13 +101,11 @@ public class DatabaseInterface
             }
         }
         catch (SQLException e) {
-            System.err.println("Got an exception!");
-            System.err.println(e.getMessage());
+            System.out.println(e.getMessage() + "Error in CheckBalance!");
         }
         return res;
     }
-    
-    //mysql insert statement
+
     public static void Insertion (String tname, String[] column, String[] value)
     {
         String tmpColumn = column[0];
@@ -138,20 +126,15 @@ public class DatabaseInterface
         + " VALUES " + "(" + tmpValue + ")";
         
         try {
-            //create the mysql insert preparedstatement
             preparedStmt = conn.prepareStatement(query);
-            
-            //execute the preparedstatement
             preparedStmt.execute();
         }
         catch (SQLException e)
         {
-            System.err.println("Got an exception!");
-            System.err.println(e.getMessage());
+            System.out.println(e.getMessage() + "Error in insertion to database!");
         }
     }
-    
-    //mysql update statement
+
     public static void Update (String tname, String[] column, String[] value, String key, String keyValue)
     {
         String tmpColumn = column[0];
@@ -166,22 +149,12 @@ public class DatabaseInterface
         + " WHERE " + key + " = " + keyValue;
         
         try {
-            //create the mysql insert preparedstatement
             preparedStmt = conn.prepareStatement(query);
-            
-//            for (int i = 0 ; i < column.length ; i++)
-//            {
-//                preparedStmt.setString (i, value[i]);
-//            }
-//            preparedStmt.setString (column.length + 1, keyValue);
-
-            //execute the preparedstatement
             preparedStmt.executeUpdate();
         }
         catch (SQLException e)
         {
-            System.err.println("Got an exception!");
-            System.err.println(e.getMessage());
+            System.out.println(e.getMessage() + "Error in updating database!");
         }
     }
     
@@ -191,26 +164,18 @@ public class DatabaseInterface
         + " = " + value + " WHERE " + key + " = " + keyValue;
         
         try {
-            //create the mysql insert preparedstatement
             preparedStmt = conn.prepareStatement(query);
-            
-            //preparedStmt.setString (1, value);
-            //preparedStmt.setString (2, keyValue);
-            
-            //execute the preparedstatement
             preparedStmt.executeUpdate();
         }
         catch (SQLException e)
         {
-            System.err.println("Got an exception!");
-            System.err.println(e.getMessage());
+            System.out.println(e.getMessage() + "Error in updating database!");
         }
     }
-    
-    //history accessing
+
     public static String GetHistory (String[] column, String[] attr, String[] attrValue)
     {
-        String tmp = "";
+        String tmp;
         String tmpColumn = column[0];
         String hist = "";
         if (attr[0].equals("AccountID")) {
@@ -234,14 +199,11 @@ public class DatabaseInterface
         tmp += ")";
         String query = "SELECT "+ tmpColumn + " FROM history WHERE " + tmp;
         try {
-            //create the mysql insert preparedstatement
             preparedStmt = conn.prepareStatement(query); 
             Statement st = conn.createStatement();
             ResultSet rs = st.executeQuery(query);
-            
             ResultSetMetaData rsmd = rs.getMetaData();
             int columnsNumber = rsmd.getColumnCount();
-            
             while (rs.next()) {
                 for(int i = 1; i <= columnsNumber; i++)
                     hist += rs.getString(i) + "\t\t\t";
@@ -250,26 +212,21 @@ public class DatabaseInterface
         }
         catch (SQLException e)
         {
-            System.err.println("Got an exception!");
-            System.err.println(e.getMessage());
+            System.out.println(e.getMessage() + "Error in getting history from database!");
         }
         return hist;
     }
-    
-    //get bank IP & port
+
     public static String[] GetBankIP (String bankName)
     {
         String []res = new String [2];
         String query = "SELECT ServerIP, ServerPort FROM bank WHERE Name =\'" + bankName + "\'";
         try {
-            //create the mysql insert preparedstatement
             preparedStmt = conn.prepareStatement(query); 
             Statement st = conn.createStatement();
             ResultSet rs = st.executeQuery(query);
-            
             ResultSetMetaData rsmd = rs.getMetaData();
             int columnsNumber = rsmd.getColumnCount();
-            
             while (rs.next()) {
                 for(int i = 1; i <= columnsNumber; i++)
                     res[i-1] = rs.getString(i);
@@ -277,8 +234,7 @@ public class DatabaseInterface
         }
         catch (SQLException e)
         {
-            System.err.println("Got an exception!");
-            System.err.println(e.getMessage());
+            System.out.println(e.getMessage() + "Error in getting bank's IP and port number!");
         }
         return res;
     }
