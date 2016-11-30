@@ -118,12 +118,12 @@ public class ClientHandler_ClientSide
         else if(msg.equals("details?")) // sign up
         {
             state = 2;
-            System.out.println("Enter Username, Password, Telephone, SSN, Amount to deposit");
+            System.out.println("Enter Full name, Password, Telephone, SSN, Amount to deposit");
         }
         else if(msg.equals("username?password?")) //sign in
         {
             state = 3;
-            System.out.println("Enter Username, Password");
+            System.out.println("Enter Account ID, Password");
         }
         else if(msg.equals("verified"))
         {
