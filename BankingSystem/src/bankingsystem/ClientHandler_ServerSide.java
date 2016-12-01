@@ -228,7 +228,8 @@ public class ClientHandler_ServerSide extends Thread {
             ID = DatabaseInterface.GetLastID();
             String[] timeDate = getTimeStamp();
             historyUpdate(ID, timeDate[1], timeDate[0], "Create an account and deposit", data[4]);
-            dos.writeUTF("verified");
+            dos.writeUTF("verifiednew");
+            dos.writeUTF(ID);
         }
         catch(IOException e)
         {
@@ -246,7 +247,7 @@ public class ClientHandler_ServerSide extends Thread {
                 String[] data = id_password.split("\n");
                 ID = data[0];
                 if (DatabaseInterface.Authentication(ID, data[1])) {
-                    dos.writeUTF("verified");
+                    dos.writeUTF("verifiedlogin");
                     break;
                 } 
                 else {

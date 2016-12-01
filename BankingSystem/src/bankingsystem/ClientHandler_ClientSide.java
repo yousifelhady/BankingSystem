@@ -125,10 +125,24 @@ public class ClientHandler_ClientSide
             state = 3;
             System.out.println("Enter Account ID, Password");
         }
-        else if(msg.equals("verified"))
+        else if(msg.equals("verifiedlogin"))
         {
             state = 4;
             System.out.println("Signed in Successfully!");
+        }
+        else if(msg.equals("verifiednew"))
+        {
+            try
+            {
+                state = 4;
+                System.out.println("Signed in Successfully!");
+                String id = dis.readUTF();
+                System.out.println("Your account ID is " + id + " ,please keep it.");
+            }
+            catch(Exception e)
+            {
+                System.out.println(e.getMessage() + "Error receiving ID after sign up");
+            }
         }
         else if(msg.equals("notverifiedlogin")) // error while sign in
         {
