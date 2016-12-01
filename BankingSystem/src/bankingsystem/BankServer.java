@@ -11,7 +11,7 @@ public class BankServer {
         try
         {
             ServerSocket server = new ServerSocket(1234);
-            
+            DatabaseInterface.Init("jdbc:mysql://127.0.0.1:3306/BankingSystem?autoReconnect=true&useSSL=false", "root", "u1234q-a-z");
             while (true) {
                 Socket clientSocket = server.accept();
                 System.out.println("Connected with a client!");
