@@ -209,7 +209,10 @@ public class ClientHandler_ClientSide
             for(int i = 0; i < lines.length; i++)
             {
                 String[] segments = lines[i].split("=");
-                System.out.println(String.format("%-20s %-20s %-50s %-20s" , segments[0], segments[1], segments[2], segments[3]));
+                if(segments[2].equals("Check balance"))
+                    System.out.println(String.format("%-20s %-20s %-50s" , segments[0], segments[1], segments[2]));
+                else
+                    System.out.println(String.format("%-20s %-20s %-50s %-20s" , segments[0], segments[1], segments[2], segments[3]));
             }
             GUI();
             
